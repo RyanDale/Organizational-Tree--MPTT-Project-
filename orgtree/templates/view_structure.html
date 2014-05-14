@@ -1,0 +1,34 @@
+<html>
+	<h1>View Structure</h1>
+	<div id="container"></div>
+	<script type='text/javascript' src='https://www.google.com/jsapi'></script>  
+	<script type='text/javascript'>  
+    google.load('visualization', '1', {packages:['orgchart']});  
+    google.setOnLoadCallback(drawChart);  
+    var chart;
+    var employees;
+    function drawChart() {  
+     var data = new google.visualization.DataTable();  
+     data.addColumn('string', 'Node');  
+     data.addColumn('string', 'Parent');
+     employees=new Array();  
+     {% for employee in employees %}
+     	employees.push(new Employee("{{employee}}","{{employee.title}}","{{employee.email_address}}","{{employee.phone}}"));
+     	data.addRow(['{{employee}}', '{{employee.parent}}'=='None'?'':'{{employee.parent}}']);
+	 {% endfor %} 
+     chart = new google.visualization.OrgChart(document.getElementById('container'));  
+     chart.draw(data);
+     google.visualization.events.addListener(chart, 'select', function(e) {
+        var selection = chart.getSelection();
+        var employee=employees[selection[0].row];
+        alert("Name: "+employee.name+"\nJob Title: "+employee.title+"\nEmail Address: "+employee.email_address+"\nPhone Number: "+employee.phone_number);
+    	}); 
+    } 
+    function Employee(name,title,email_address,phone_number){
+    	this.name=name;
+    	this.title=title;
+    	this.email_address=email_address;
+    	this.phone_number=phone_number;
+    }
+   </script> 
+</html>
