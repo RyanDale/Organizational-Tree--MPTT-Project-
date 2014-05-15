@@ -1,23 +1,19 @@
-from django.shortcuts import render, redirect,render_to_response,  HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from orgtree.models import Employee
+from django.views.generic import ListView, DetailView
+from django.views.generic.edit import CreateView
 from orgtree.forms import EmployeeForm
 
-def add_employee(request):
-	"""First checks to see if this is a new request or if the user has already tryed to fill out the form. If the form 
-	has been correctly filled out the model is saved and the user is redirected to the view structure page. If there 
-	were errors then those are returned so the user can fix them."""
-	if request.method=='POST':
-		form = EmployeeForm(request.POST)
-		if form.is_valid():
-			form.save()
-			return HttpResponseRedirect('/view_structure/')
-	else:
-		form = EmployeeForm
-	return render(request,"add_employee.html",{'form':form})
+class EmployeeDetail(DetailView):
+    model=Employee
+    context_object_name = "employee"
+    template_name = "employee_detail.html"
+    slug_field = "pk"
 
-def view_structure(request):
-	"""Returns all of the employee objects to the template so they can be displayed in a tree"""
-	return render(request,"view_structure.html",
-			{
-				'employees':Employee.objects.all()
-			})
+    def get_queryset(self):
+        return Employee.objects.filter(id=self.kwargs['pk'])
+
+class EmployeeCreate(CreateView):
+    model=Employee
+    fields = ['name','title','email_address','phone','parent']
+    template_name = "employee_form.html"

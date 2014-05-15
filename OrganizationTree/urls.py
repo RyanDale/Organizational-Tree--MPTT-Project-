@@ -1,20 +1,18 @@
 from django.conf.urls import patterns, include, url
-
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
+from django.views.generic import list_detail
+from orgtree.models import Employee
+from orgtree.views import EmployeeCreate, EmployeeDetail
+
+orgstructure_data = {
+    "queryset":Employee.objects.all(),
+    "template_name":"view_structure.html",
+}
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'OrganizationTree.views.home', name='home'),
-    # url(r'^OrganizationTree/', include('OrganizationTree.foo.urls')),
-
-	url(r'^view_structure/', 'orgtree.views.view_structure', name='View Structure'),
-	url(r'^add_employee/', 'orgtree.views.add_employee', name='Add Employee'),
-
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
+	url(r'^employee_detail/(?P<pk>.*?)/$', EmployeeDetail.as_view(), name="employee_detail"),
+	url(r'^view_structure/', list_detail.object_list, orgstructure_data, name='view_structure'),
+	url(r'^add_employee/', EmployeeCreate.as_view(), name='add_employee'),
     url(r'^admin/', include(admin.site.urls)),
 )
